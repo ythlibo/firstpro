@@ -1,0 +1,24 @@
+2017-02-10 15:36:15.277 [main] WARN  com.milepost.logback.LogbackTest - 7======warnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarn
+2017-02-10 15:36:15.334 [main] ERROR com.milepost.logback.LogbackTest - 7======中国errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror
+2017-02-10 15:36:15.335 [main] DEBUG com.milepost.logback.LogbackTest - 8======debugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebug
+2017-02-10 15:36:15.335 [main] INFO  com.milepost.logback.LogbackTest - 8======infoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfo
+2017-02-10 15:36:15.335 [main] WARN  com.milepost.logback.LogbackTest - 8======warnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarn
+2017-02-10 15:36:15.346 [main] ERROR com.milepost.logback.LogbackTest - 8======中国errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror
+2017-02-10 15:36:15.346 [main] DEBUG com.milepost.logback.LogbackTest - 9======debugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebugdebug
+2017-02-10 15:36:15.347 [main] INFO  com.milepost.logback.LogbackTest - 9======infoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfoinfo
+2017-02-10 15:36:15.347 [main] WARN  com.milepost.logback.LogbackTest - 9======warnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarnwarn
+2017-02-10 15:36:15.347 [main] ERROR com.milepost.logback.LogbackTest - 9======中国errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror
+2017-02-10 15:37:50.514 [main] DEBUG org.apache.ibatis.logging.LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-02-10 15:37:50.877 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Property 'configLocation' not specified, using default MyBatis Configuration
+2017-02-10 15:37:50.925 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Property 'mapperLocations' was not specified or no matching resources found
+2017-02-10 15:37:52.347 [main] INFO  c.m.system.cache.MyKeyGenerator - 读取key为EmployeeService@1641367541.findById(d871e1854b5a41d1bac3c832fb857e83)的缓存数据...
+2017-02-10 15:37:52.822 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2017-02-10 15:37:52.828 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@747affe0]
+2017-02-10 15:37:52.836 [main] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [com.mchange.v2.c3p0.impl.NewProxyConnection@4316c3e2] will be managed by Spring
+2017-02-10 15:37:52.848 [main] DEBUG c.m.d.mapper.EmployeeMapper.findById - ==>  Preparing: select * from employee where id = ? 
+2017-02-10 15:37:52.927 [main] DEBUG c.m.d.mapper.EmployeeMapper.findById - ==> Parameters: d871e1854b5a41d1bac3c832fb857e83(String)
+2017-02-10 15:37:52.979 [main] DEBUG c.m.d.mapper.EmployeeMapper.findById - <==      Total: 0
+2017-02-10 15:37:52.988 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@747affe0]
+2017-02-10 15:37:52.989 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@747affe0]
+2017-02-10 15:37:52.989 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@747affe0]
+2017-02-10 15:37:52.989 [main] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@747affe0]

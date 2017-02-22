@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+	
+	<!-- 配置自动扫描的包 -->
+	<context:component-scan base-package="com.milepost">
+		<!-- 扫描除这两个注解之外的所有注解 -->
+		<!-- 所有控制器 -->
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<!-- 处理异常的 -->
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+	
+	<!-- 1. 配置 C3P0 数据源 -->
+	<context:property-placeholder location="classpath:db.properties" />
+	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="user" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+		<property name="driverClass" value="${jdbc.driverClass}"></property>
+		
+		<!-- 参照点都的配置，见ddsoft-system-1.0.0.jar\spring\spring-module.xml -->
+		<!-- 数据库连接池中的最小的数据库连接数 -->
+		<property name="minPoolSize" value="3"></property>
+		
+		<!-- 数据库连接池中的最大的数据库连接数 -->
+		<property name="maxPoolSize" value="50"></property>
+		
+		<!-- 初始化数据库连接池时连接的数量 -->
+		<property name="initialPoolSize" value="3"></property>
+		
+		<!--最大空闲时间，60秒内未使用则连接被丢弃。若为0则永不丢弃。默认值: 0 -->   
+		<property name="maxIdleTime" value="60" />
+		
+		<!-- 若数据库中连接数不足时, 一次向数据库服务器申请多少个连接 -->
+		<property name="acquireIncrement" value="5" />
+		
+		<!--c3p0是异步操作的，缓慢的JDBC操作通过帮助进程完成。扩展这些操作可以有效的提升性能 通过多线程实现多个操作同时被执行。Default: 3--> 
+		<property name="numHelperThreads" value="30" />
+		
+		<!--定义在从数据库获取新连接失败后重复尝试的次数。默认值: 30 ；小于等于0表示无限次-->
+		<property name="acquireRetryAttempts" value="2" />
+		
+		<!--重新尝试的时间间隔，默认为：1000毫秒-->   
+		<!-- <property name="acquireRetryDelay" value="1000" /> -->
+		
+		<!--因性能消耗大请只在需要的时候使用它。如果设为true那么在每个connection提交的时候都将校验其有效性。
+		建议使用idleConnectionTestPeriod或automaticTestTable等方法来提升连接测试的性能。Default: false --> 
+		<!-- <property name="testConnectionOnCheckout" value="false"></property> --> 
+
+		<!--如果设为true那么在取得连接的同时将校验连接的有效性。Default: false --> 
+		<!-- <property name="testConnectionOnCheckin" value="true" /> -->
+		
+		<!--c3p0将建一张名为c3p0TestTable的空表，并使用其自带的查询语句进行测试。如果定义了这个参数那么属性preferredTestQuery将被忽略。你不能在这张Test表上进行任何操作，它将只供c3p0测试使用。默认值: null -->   
+		<!-- <property name="automaticTestTable" value="c3p0TestTable" /> -->
+		
+		<!--每60秒检查所有连接池中的空闲连接。默认值: 0，不检查 -->   
+		<!-- <property name="idleConnectionTestPeriod" value="60" /> -->
+		
+		<!-- 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出SQLException，如设为0则无限期等待。单位毫秒。默认: 0 -->   
+		<!-- <property name="checkoutTimeout" value="100" /> -->
+		
+	</bean>
+	
+	
+	<!--2. 操作数据库相关，可以使用MyBatis，也可以使用Spring 的 JdbcTemplate,
+		Spring 的 JdbcTemplate 与 MyBatis 的 SqlSessionFactoryBean 是同等级别的，大项目中用 SqlSessionFactoryBean ，
+		小项目中用 JdbcTemplate，可以将 JdbcTemplate 可以注入到 dao 中，然后直接使用其中的方法，无需做什么关闭操作
+	 
+		A.配置 MyBatis 
+		A.1. 配置MyBatis的sqlSessionFactory，mybatis的SqlSession的工厂: SqlSessionFactoryBean 
+			dataSource：引用数据源
+			typeAliasesPackage：指定实体类的报名，自动将实体类的简单类名映射成为别名。相当于/day03_mybaits/src/conf.xml中实体类别名的配置
+	-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 指定MyBitas的sql语句映射文件，如果MyBitas的sql语句映射文件对应的接口不在一个包目录下，
+			就需要在这里单独指定MyBitas的sql语句映射文件，这里把他们放在一个目录下了，就只需要统一的通过MapperScannerConfigurer的
+			basePackage指定了。
+		-->
+        <!-- <property name="mapperLocations">
+            <array>
+                <value>classpath:mapper/*.xml</value>
+            </array>
+        </property> -->
+        <!-- 指定MyBitas的实体类的包名，自动将实体类的简单类名映射成为别名，
+        	这里不能使用通配符，而所有模块的实体不能放在一个包中，所有指定了也没什么意义，还不如直接在mapper文件中指定全类名
+         -->
+		<!-- <property name="typeAliasesPackage" value="com.milepost.demo.entity"/> -->
+	</bean>
+	
+	<!-- A.2. mybatis自动扫描加载Sql映射文件/接口 : MapperScannerConfigurer 
+			basePackage：指定 Sql映射文件/接口所在的包(自动扫面)，可以使用通配符
+	-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.milepost.*.mapper"/>
+	</bean> 
+	<!-- B.1 配置jdbcTemplate，只能接受占位符(?)类型的sql语句，可以通过namedParameterJdbcTemplate获取到jdbcTemplate -->
+    <!-- <bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean> -->
+	<!-- B.2 配置namedParameterJdbcTemplate，只能接受命名参数(:xxx)类型的sql语句 -->
+	<bean id="namedParameterJdbcTemplate" 
+		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg ref="dataSource"></constructor-arg>
+	</bean>
+	<!-- B.3 配置两个jdbcTemplate和namedParameterJdbcTemplate的分页，暂时提供两个实现，这里都配置上，会根据当前的jdbcTemplate来判断是哪个类型的数据库  -->
+	<bean id="mysqlSQLPageHandleImpl" class="com.milepost.system.sqlparser.MysqlSQLPageHandleImpl"/>
+	<bean id="oracleSQLPageHandleImpl" class="com.milepost.system.sqlparser.OracleSQLPageHandleImpl"/>
+	
+	<!-- 3. 配置 Spring 的声明式事务 -->
+	<!-- 3.1. 配置 Spring 的事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+	<!-- 3.2. 配置事务属性，需要事务管理器 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<!-- 4. 二级缓存相关 -->
+	<!-- 4.1. 缓存管理器 -->
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="cacheManagerFactoryBean" />
+	</bean>
+
+	<!-- 4.2. 缓存管理器工厂bean -->
+	<bean id="cacheManagerFactoryBean" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<!-- 指定配置缓存过期策略的文件位置，ehcache.xml -->
+		<property name="configLocation" value="classpath:ehcache.xml" />
+	</bean>
+
+	<!-- 4.3. 自定义缓存key生成器 -->
+	<bean id="keyGenerator" class="com.milepost.system.cache.MyKeyGenerator" />
+	
+	<!-- 4.4. 缓存通知 --> 
+	<cache:advice id="cacheAdvice" cache-manager="cacheManager" key-generator="keyGenerator">
+		<cache:caching cache="myCache">
+			<!-- service中的以下方法可以缓存 -->
+			<cache:cacheable method="get*" />
+			<cache:cacheable method="load*" />
+			<cache:cacheable method="find*" />
+			
+			<!-- 执行以下方法之后，要把缓存除掉，重新加载缓存,all-entries="true"表示除掉全部实体 -->
+			<cache:cache-evict method="save*" all-entries="true" />
+			<cache:cache-evict method="update*" all-entries="true"/>
+			<cache:cache-evict method="delete*" all-entries="true"/>
+			<cache:cache-evict method="clear*" all-entries="true"/>
+			<cache:cache-evict method="toggle*" all-entries="true"/>
+			<cache:cache-evict method="move*" all-entries="true"/>
+			<cache:cache-evict method="batch*" all-entries="true"/>
+			<cache:cache-evict method="execute*" all-entries="true"/>
+		</cache:caching>
+	</cache:advice>
+	
+	<!-- 5. 配置缓存切点 
+		execution(* *..*Service.*(..))，按照顺序解释
+		*：代表任意修饰符及任意返回值
+		*.（也可以去掉.）：代表任何包以及任何包的子包
+		.：包和类的分隔
+		*Service：以Service结尾的类或者接口
+		.*：任何方法
+		(..)：任意数量的参数
+	-->
+	<!-- aop:config 中的 aop:advisor 必须在上面，aop:aspect 要在下面，不设置优先级的情况下，配置在上面的先执行，
+		 order：设置优先级，值越大优先级越低
+	  -->
+	<aop:config>
+		<!-- 缓存切入点通知：与事务的切入点相同，但是之后执行查询的方式时候缓存，执行更新的方法之后，会清掉缓存 -->
+		<aop:advisor advice-ref="cacheAdvice" pointcut="execution(* *..*Service.*(..))" order="0"/>
+	</aop:config>
+
+</beans>

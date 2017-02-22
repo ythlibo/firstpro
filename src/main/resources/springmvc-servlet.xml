@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!-- 1.配置自动扫描的包 -->
+	<context:component-scan base-package="com.milepost" use-default-filters="false">
+		<!-- 只扫描这个两个注解 -->
+		<!-- 所有控制器 -->
+		<context:include-filter type="annotation" 
+			expression="org.springframework.stereotype.Controller"/>
+		<!-- 处理异常的，见“/springmvc-2/src/com/atguigu/springmvc/test/SpringMVCTest.java” -->
+		<context:include-filter type="annotation" 
+			expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	<!-- 2.配置视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/views/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<!-- 3.配置国际化资源文件 -->
+	<bean id="messageSource" 
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="i18n"></property>	
+	</bean>
+	
+	<!-- 4.处理静态资源 
+		default-servlet-handler 将在 SpringMVC 上下文中定义一个 DefaultServletHttpRequestHandler,
+		它会对进入 DispatcherServlet 的请求进行筛查, 如果发现是没有经过映射的请求, 就将该请求交由 WEB 应用服务器默认的 
+		Servlet 处理. 如果不是静态资源的请求，才由 DispatcherServlet 继续处理
+
+		一般 WEB 应用服务器默认的 Servlet 的名称都是 default.
+		若所使用的 WEB 服务器的默认 Servlet 名称不是 default，则需要通过 default-servlet-name 属性显式指定
+	-->
+	<mvc:default-servlet-handler/>
+	<!-- 配置直接转发的页面，可以直接响应转发的页面, 而无需再经过 Handler 的方法(目标方法). 可配置多个 
+	<mvc:view-controller path="/test" view-name="success"/>-->
+	
+	<!-- 5.标准配置 -->
+	<mvc:annotation-driven>
+		<!-- 消息转换器：解决使用@ResponseBody注解返回普通Json数据乱码的问题 -->
+	    <mvc:message-converters register-defaults="true">
+	      <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+	        <property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
+	      </bean>
+	    </mvc:message-converters>
+	</mvc:annotation-driven>
+</beans>

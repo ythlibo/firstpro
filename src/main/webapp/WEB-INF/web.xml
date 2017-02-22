@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+		
+	<!-- 配置启动 IOC 容器的 Listener -->	
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext.xml</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- 配置日志初始化slf4j的 Listener -->
+	<context-param>
+		<param-name>logbackConfigLocation</param-name>
+		<param-value>WEB-INF/classes/logback.xml</param-value>
+	</context-param>
+	<listener>
+		<listener-class>com.milepost.system.listener.LogbackConfigListener</listener-class>
+	</listener>
+	 
+	<!-- 配置字符编码过滤器:必须配置在所有过滤器的最前面！只对post方式的表单提交的中文参数有效，对url附带的中文参数无效 -->
+	<filter>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- 
+	配置 OpenEntityManagerInViewFilter，可以解决懒加载异常的问题，类似 hibernateOpenSessionInViewFilter，
+	见“/ssh/WebContent/WEB-INF/web.xml”
+	缺点：会增加程序连接数据库的时间，并发量大的时候就不行了，也可以在程序中的 Service 层写代码来初始化级联属性，就不用配置这个 Filter 了，
+	SureveyPark 项目中就是采用的在 Service 层写代码来初始化级联属性。
+	--> 
+	<!-- 配置解决懒加载异常的过滤器 
+	<filter>
+		<filter-name>OpenEntityManagerInViewFilter</filter-name>
+		<filter-class>
+			org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter
+		</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>OpenEntityManagerInViewFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	-->
+	
+	<!-- 配置可以把 POST 请求转为 PUT、DELETE 请求的 Filter：暂时没用使用
+	<filter>
+		<filter-name>HiddenHttpMethodFilter</filter-name>
+		<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>HiddenHttpMethodFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping> -->
+	
+	<!-- 配置 SpringMVC 的 DispatcherServlet -->
+	<servlet>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!-- 配置 SpringMVC 配置文件的位置和名称
+			默认的配置文件为: /WEB-INF/<servlet-name>-servlet.xml -->
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:springmvc-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<!-- 
+			这里的配置就是Tomcat 的 “D:\Tomcat6\conf\web.xml”文件中配置的名称为“default”的 Servlet，感觉好像是覆盖掉了这个默认的 Servlet。
+			“/*”：匹配所有的URL，包括“.jsp”。
+			“/”：是 Tomcat 的 “D:\Tomcat6\conf\web.xml”文件中配置的名称为“default”的 Servlet，匹配所有的当程序运行过程中，发现某个请求
+			不予被任何一个 Servlet 匹配，这时就交给 这个默认的 Servlet 处理，例如一些静态的 html、css、js 等，jsp除外，因为jsp 是动态资源,
+		 -->
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
+	<session-config>
+		<session-timeout>10</session-timeout>
+	</session-config>
+	
+</web-app>

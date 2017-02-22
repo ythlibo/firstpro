@@ -224,7 +224,7 @@ public class BaseDaoTest {
 	
 	@Test
 	public void testQueryWithRowMapper(){
-		String sql = "select * from employee where id = '8103aa6ae372439c977546487556a270'";
+		String sql = "select * from employee where id = 'id-AA'";
 		//自己实现RowMapper，指定如何封装结果集
 		RowMapper<Employee> rowMapper = new RowMapper<Employee>() {
 			@Override
@@ -245,9 +245,42 @@ public class BaseDaoTest {
 	}
 	
 	@Test
+	public void testQueryWithRowMapper1() throws Exception{
+		String sql = "select * from employee where [id = :id or] birth = :birth [or age = :age]";
+		//自己实现RowMapper，指定如何封装结果集
+		RowMapper<Employee> rowMapper = new RowMapper<Employee>() {
+			@Override
+			public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Employee employee = new Employee();
+				employee.setId(rs.getString("id"));
+				employee.setLastName(rs.getString("last_name"));
+				employee.setEmail(rs.getString("email"));
+				employee.setBirth(rs.getDate("birth"));
+				employee.setCreateTime(rs.getDate("create_time"));
+				Department department = new Department(rs.getString("department_id"), null);
+				employee.setDepartment(department  );
+				return employee;
+			}
+		};
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("birth", DateUtil.str2Date("2010-01-01"));
+		Employee employee = employeeDao.queryWithRowMapper(sql, paramMap, rowMapper);
+		System.out.println(employee);
+	}
+	
+	@Test
 	public void testQueryForBean(){
-		String sql = "select * from employee where id = '8103aa6ae372439c977546487556a270'";
+		String sql = "select * from employee where id = 'id-AA'";
 		Employee employee = employeeDao.queryForBean(sql, Employee.class);
+		System.out.println(employee);
+	}
+	
+	@Test
+	public void testQueryForBean1() throws Exception{
+		String sql = "select * from employee where [id = :id or] birth = :birth [or age = :age]";
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("birth", DateUtil.str2Date("2010-01-01"));
+		Employee employee = employeeDao.queryForBean(sql, paramMap, Employee.class);
 		System.out.println(employee);
 	}
 	
@@ -259,9 +292,59 @@ public class BaseDaoTest {
 	}
 	
 	@Test
+	public void testQueryForMap1() throws Exception{
+		String sql = "select * from employee where [id = :id or] birth = :birth [or age = :age]";
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("birth", DateUtil.str2Date("2010-01-01"));
+		Map<String, Object> map = employeeDao.queryForMap(sql, paramMap);
+		System.out.println(map);
+	}
+	
+	@Test
+	public void testQueryForString(){
+		String sql = "select last_name from employee where id = 'id-AA'";
+		String lastName = employeeDao.queryForString(sql);
+		System.out.println(lastName);
+	}
+	
+	@Test
+	public void testQueryForString1() throws Exception{
+		String sql = "select last_name,id from employee where [id = :id or] birth = :birth [or age = :age]";
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("birth", DateUtil.str2Date("2010-01-01"));
+		String lastName = employeeDao.queryForString(sql, paramMap);
+		System.out.println(lastName);
+	}
+	
+	@Test
+	public void testQueryForInt(){
+		String sql = "select count(*) from employee where 1=1";
+		long count = employeeDao.queryForLong(sql);
+		System.out.println(count);
+	}
+	
+	@Test
+	public void testQueryForInt1() throws Exception{
+		String sql = "select count(*) from employee where birth >= :birth [or last_name like '%'+ :lastName +'%']";
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("birth", DateUtil.str2Date("2010-01-01"));
+		int count = employeeDao.queryForInt(sql, paramMap);
+		System.out.println(count);
+	}
+	
+	@Test
 	public void testQueryForLong(){
 		String sql = "select count(*) from employee where 1=2";
 		long count = employeeDao.queryForLong(sql);
+		System.out.println(count);
+	}
+	
+	@Test
+	public void testQueryForLong1() throws Exception{
+		String sql = "select count(*) from employee where birth >= :birth [or last_name like '%'+ :lastName +'%']";
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("birth", DateUtil.str2Date("2010-01-01"));
+		long count = employeeDao.queryForLong(sql, paramMap);
 		System.out.println(count);
 	}
 	
@@ -273,6 +356,17 @@ public class BaseDaoTest {
 	}
 	
 	@Test
+	public void testQueryForObject1() throws Exception{
+		String sql = "select last_name from employee where id = :id [and last_name = :lastName] and birth = :birth";
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("id", "id-AA");
+		paramMap.put("birth", DateUtil.str2Date("2010-01-01"));
+		String lastName = employeeDao.queryForObject(sql, paramMap, String.class);
+		System.out.println(lastName);
+	}
+	
+	
+	@Test
 	public void testUpdateOrInsertOrDelete(){
 		String sql = "delete from employee where id = 'b'";
 		int affectedRows = employeeDao.updateOrInsertOrDelete(sql);
@@ -280,30 +374,163 @@ public class BaseDaoTest {
 	}
 	
 	@Test
-	public void testUpdate() throws Exception{
-		String sql = "update EMPLOYEE SET id = '-' || :id || '-', LAST_NAME = '-' || :lastName || '-'[, email = :email][, birth = :birth][, create_time = :createTime][, age = :age] [, remark = :remark] WHERE id = :id and last_name like '%'|| :lastName ||'%'";
+	public void testDelete() throws Exception{
+		String sql = null;
 		Map<String, Object> paramMap = new HashMap<String, Object>();
-//		paramMap.put("id", UUIDGenerator.getUUID());
-		paramMap.put("id", "b37992f33e8f49b29aca8aacaa28b600");
-		paramMap.put("lastName", "zhang");
-		paramMap.put("email", "zhang@milepost.com");
-		paramMap.put("birth", DateUtil.str2Date("2016-10-10"));
-		paramMap.put("createTime", new Date());
-		paramMap.put("age", 23);
-		int affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+		int affectedRows = 0;
+		
+		//全部是必须参数，全部有值
+//		sql = "delete from employee where id = :id and last_name = :lastName and create_time >= :createTime";
+//		paramMap.put("id", "aa");
+//		paramMap.put("lastName", "aa");
+//		paramMap.put("createTime", DateUtil.str2Date("2017-01-01 01:01:01"));
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//全部有值
+//		sql = "delete from employee where [id = :id and] last_name = :lastName [and create_time >= :createTime]";
+//		paramMap.put("id", "---529991b52f444371a0112c15c35885cd--1-");
+//		paramMap.put("lastName", "--李四--");
+//		paramMap.put("createTime", DateUtil.str2Date("2010-10-01 00:00:00"));
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//全部没有有值
+//		sql = "delete from employee where id = :id [and last_name = :lastName] [and create_time >= :createTime]";
+//		paramMap.put("id", "ceed42ffd8d748e98f46fea8329bc4cf");
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+
+		//必选参数没有值，将抛出异常
+//		sql = "delete from employee where id = :id [and last_name = :lastName] [and create_time >= :createTime]";
+//		paramMap.put("lastName", "斯蒂芬");
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//delete 语句中包含select语句
+		sql = "delete from employee where id = (select id from employee where [create_time = :createTime or] last_name like '%' || :lastName || '%' [or id = :id ][or birth = :birht ])";
+		paramMap.put("lastName", "斯蒂芬");
+		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
 		System.out.println(affectedRows);
+	}
+	
+	
+	@Test
+	public void testUpdate() throws Exception{
+		String sql = null;
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		int affectedRows = 0;
+		
+		//全部有值
+//		sql = "update EMPLOYEE SET id = '-' || :id || '-', LAST_NAME = '-' || :lastName || '-'[, email = :email][, birth = :birth][, create_time = :createTime][, age = :age] [, remark = :remark] WHERE id = :id";
+//		paramMap.clear();
+//		paramMap.put("id", "529991b52f444371a0112c15c35885cd");
+//		paramMap.put("lastName", "zhang");
+//		paramMap.put("email", "zhang@milepost.com");
+//		paramMap.put("birth", DateUtil.str2Date("2016-10-10"));
+//		paramMap.put("createTime", DateUtil.str2Date("2010-10-10"));
+//		paramMap.put("remark", "努力学习");
+//		paramMap.put("age", 23);
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//全部没有值
+//		sql = "update EMPLOYEE SET id = '-' || :id || '-', LAST_NAME = '-' || :lastName || '-'[, email = :email][, birth = :birth][, create_time = :createTime][, age = :age] [, remark = :remark] WHERE id = :id";
+//		paramMap.clear();
+//		paramMap.put("id", "-529991b52f444371a0112c15c35885cd-");
+//		paramMap.put("lastName", "zhang22");
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//必须参数没有值，抛出异常
+//		sql = "update EMPLOYEE SET id = '-' || :id || '-', LAST_NAME = '-' || :lastName || '-'[, email = :email][, birth = :birth][, create_time = :createTime][, age = :age] [, remark = :remark] WHERE id = :id";
+//		paramMap.clear();
+//		paramMap.put("id", "-529991b52f444371a0112c15c35885cd-");
+//		paramMap.put("email", "zhang@milepost.com");
+//		paramMap.put("birth", DateUtil.str2Date("2016-10-10"));
+//		paramMap.put("remark", "努力学习");
+//		paramMap.put("age", 23);
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//一部分有值的
+//		sql = "update EMPLOYEE SET id = '-' || :id || '-', LAST_NAME = '-' || :lastName || '-'[, email = :email][, birth = :birth][, create_time = :createTime][, age = :age] [, remark = :remark] WHERE id = :id";
+//		paramMap.clear();
+//		paramMap.put("id", "--529991b52f444371a0112c15c35885cd--");
+//		paramMap.put("lastName", "李四");
+//		paramMap.put("email", "zhang@milepost.com");
+//		paramMap.put("age", 23);
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//update中有select语句
+//		sql = "update EMPLOYEE SET id = '-' || :id || '-', LAST_NAME = '-' || :lastName || '-'[, email = :email][, birth = :birth][, create_time = :createTime][, age = :age] [, remark = :remark] WHERE id = (select id from employee where last_name = :lastName [and remark = :remark])";
+//		paramMap.clear();
+//		paramMap.put("id", "--529991b52f444371a0112c15c35885cd--1");
+//		paramMap.put("lastName", "-李四-");
+//		paramMap.put("email", "zhang@milepost.com1");
+//		paramMap.put("age", 231);
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//全部是必须参数
+		sql = "update EMPLOYEE SET id = '-' || :id || '-', LAST_NAME = '-' || :lastName || '-' WHERE id = :id";
+		paramMap.clear();
+		paramMap.put("id", "a593435ba721412b985abb92264ac1bf");
+		paramMap.put("lastName", "-李四1-");
+		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+		System.out.println(affectedRows);
+		
 	}
 	
 	@Test
 	public void testInsert() throws Exception{
-		String sql = "insert into employee(id,last_name, email, birth, create_time, age, remark) "
-				+ "values('"+ UUIDGenerator.getUUID() +"'[, :lastName][, :email][, :birth][, :createTime][, :age][, :remark])";
 		Map<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("lastName", "张三1");
-		paramMap.put("email", "zhangsan1@milepost.com");
-		paramMap.put("createTime", new Date());
+		String sql = null;
+		int affectedRows = 0;
+		//参数全部存在
+//		sql = "insert into employee(id,last_name, email, birth, create_time, age, remark) "
+//				+ "values(:id [, :lastName][, :email][, :birth][, :createTime][, :age][, :remark])";
+//		paramMap.clear();
+//		paramMap.put("id", UUIDGenerator.getUUID());
+//		paramMap.put("lastName", "张三");
+//		paramMap.put("email", "zhangsan@milepost.com");
+//		paramMap.put("birth", DateUtil.str2Date("1990-01-01"));
+//		paramMap.put("createTime", DateUtil.str2Date("1990-01-01 01:01:01"));
+//		paramMap.put("age", 23);
+//		paramMap.put("remark", "努力学习");
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+//		
+		//参数全部不存在,，只插入一列必须参数id
+//		sql = "insert into employee(id,last_name, email, birth, create_time, age, remark) "
+//				+ "values(:id [, :lastName][, :email][, :birth][, :createTime][, :age][, :remark])";
+//		paramMap.clear();
+//		paramMap.put("id", UUIDGenerator.getUUID());
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//一个必须参数，但是没有参数值，将抛出异常
+//		sql = "insert into employee(id,last_name, email, birth, create_time, age, remark) "
+//				+ "values(:id , :lastName[, :email], :birth[, :createTime][, :age][, :remark])";
+//		paramMap.clear();
+//		paramMap.put("id", UUIDGenerator.getUUID());
+//		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+//		System.out.println(affectedRows);
+		
+		//insert语句不存在列名部分的，这时sql语句中不能包含可选参数，否则会报错，因为没有列明默认是按照位置插入所有列
+		sql = "insert into employee "
+				+ "values(:id, [:lastName,] [:email,] :birth, [:createTime,] :departmentId[, :age][, :remark])";
+		paramMap.clear();
+		paramMap.put("id", UUIDGenerator.getUUID());
+		paramMap.put("lastName", "张三");
+		paramMap.put("email", "zhangsan@milepost.com");
+		paramMap.put("birth", DateUtil.str2Date("1990-01-01"));
+		paramMap.put("createTime", DateUtil.str2Date("1990-01-01 01:01:01"));
 		paramMap.put("age", 23);
-		int affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
+		paramMap.put("remark", "努力学习");
+		paramMap.put("departmentId", "01");
+		affectedRows = employeeDao.updateOrInsertOrDelete(sql, paramMap);
 		System.out.println(affectedRows);
 	}
 	

@@ -161,6 +161,14 @@ public class ParserSqlToDynamicTest {
 //		System.out.println(ParserSqlToDynamic.parserSql(sql, paramMap));
 //		System.out.println(sql);
 		
+		Map<String,String> paramMap = new HashMap<String, String>();
+		paramMap.put("id", "-id-");
+		paramMap.put("lastName", "-lastName-");
+		String sql = "update EMPLOYEE SET id = '-' || :id || '-', LAST_NAME = '-' || :lastName || '-'[, email = :email][, birth = :birth][, create_time = :createTime][, age = :age] [, remark = :remark] WHERE id = :id";
+		System.out.println(ParserSqlToDynamic.parserSql(sql, paramMap));
+		System.out.println(sql);
+		
+		
 	}
 	@Test
 	public void testParserSqlWithParamMap() throws Exception{

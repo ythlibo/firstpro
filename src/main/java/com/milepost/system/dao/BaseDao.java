@@ -86,6 +86,16 @@ public interface BaseDao {
 	/**
 	 * 单行查询
 	 * @param sql
+	 * @param paramMap 参数Map
+	 * @param rowMapper 自己实现的RowMapper，用来指定如何封装结果集
+	 * @return
+	 * @throws DataAccessException
+	 */
+	public <T> T queryWithRowMapper(String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper) throws Exception;
+	
+	/**
+	 * 单行(一行多列)查询
+	 * @param sql
 	 * @param requiredType
 	 * @return 指定的类型
 	 * @throws DataAccessException
@@ -93,7 +103,17 @@ public interface BaseDao {
 	public <T> T queryForBean(String sql, Class<T> requiredType) throws DataAccessException;
 	
 	/**
-	 * 单行查询
+	 * 单行(一行多列)查询
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @param requiredType
+	 * @return 指定的类型
+	 * @throws DataAccessException
+	 */
+	public <T> T queryForBean(String sql, Map<String, ?> paramMap, Class<T> requiredType) throws Exception;
+	
+	/**
+	 * 单行(一行多列)查询
 	 * @param sql 
 	 * @return Map<String, Object>的key为sql中列的别名的大写形式
 	 * @throws DataAccessException
@@ -101,7 +121,16 @@ public interface BaseDao {
 	public Map<String, Object> queryForMap(String sql) throws DataAccessException;
 	
 	/**
-	 * 单值查询
+	 * 单行(一行多列)查询
+	 * @param sql 
+	 * @param paramMap 参数Map
+	 * @return Map<String, Object>的key为sql中列的别名的大写形式
+	 * @throws DataAccessException
+	 */
+	public Map<String, Object> queryForMap(String sql, Map<String, ?> paramMap) throws Exception;
+	
+	/**
+	 * 单值(一行一列)查询
 	 * @param sql
 	 * @return 
 	 * @throws DataAccessException
@@ -109,7 +138,16 @@ public interface BaseDao {
 	public String queryForString(String sql) throws DataAccessException;
 	
 	/**
-	 * 单值查询
+	 * 单值(一行一列)查询
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @return 
+	 * @throws DataAccessException
+	 */
+	public String queryForString(String sql, Map<String, ?> paramMap) throws Exception;
+	
+	/**
+	 * 单值(一行一列)查询
 	 * @param sql
 	 * @return 
 	 * @throws DataAccessException
@@ -117,7 +155,16 @@ public interface BaseDao {
 	public int queryForInt(String sql) throws DataAccessException;
 
 	/**
-	 * 单值查询
+	 * 单值(一行一列)查询
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @return
+	 * @throws DataAccessException
+	 */
+	public int queryForInt(String sql, Map<String, ?> paramMap) throws Exception;
+	
+	/**
+	 * 单值(一行一列)查询
 	 * @param sql
 	 * @return
 	 * @throws DataAccessException
@@ -125,7 +172,16 @@ public interface BaseDao {
 	public long queryForLong(String sql) throws DataAccessException;
 	
 	/**
-	 * 单值查询，返回指定的类型
+	 * 单值(一行一列)查询
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @return
+	 * @throws DataAccessException
+	 */
+	public long queryForLong(String sql, Map<String, ?> paramMap) throws Exception;
+	
+	/**
+	 * 单值(一行一列)查询，返回指定的类型
 	 * @param sql
 	 * @param requiredType 指定的返回值类型
 	 * @return
@@ -133,6 +189,15 @@ public interface BaseDao {
 	 */
 	public <T> T queryForObject(String sql, Class<T> requiredType) throws DataAccessException;
 	
+	/**
+	 * 单值(一行一列)查询，返回指定的类型
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @param requiredType 指定的返回值类型
+	 * @return
+	 * @throws DataAccessException
+	 */
+	public <T> T queryForObject(String sql, Map<String, ?> paramMap, Class<T> requiredType) throws Exception;
 	
 	/**
 	 * 执行一个sql语句，sql语句通常为DML（data manipulation language 数据库操纵语言）语句，即SELECT（除外）、UPDATE、INSERT、DELETE
@@ -144,7 +209,7 @@ public interface BaseDao {
 	 * @see int org.springframework.jdbc.core.JdbcTemplate.update(String sql)
 	 *      throws DataAccessException
 	 */
-	public int updateOrInsertOrDelete(final String sql) throws DataAccessException;
+	public int updateOrInsertOrDelete(String sql) throws DataAccessException;
 	
 	/**
 	 * 执行一个sql语句，sql语句通常为DML（data manipulation language 数据库操纵语言）语句，即SELECT（除外）、UPDATE、INSERT、DELETE。<br>
@@ -174,7 +239,7 @@ public interface BaseDao {
 	 *      org.springframework.jdbc.core.JdbcTemplate.batchUpdate(String[] sql)
 	 *      throws DataAccessException
 	 */
-	public int[] batchUpdateOrInsertOrDelete(final String[] sqlArray) throws DataAccessException;
+	public int[] batchUpdateOrInsertOrDelete(String[] sqlArray) throws DataAccessException;
 	
 	/**
 	 * 一个sql语句赋予不同的参数，依次执行，sql语句通常为DML（data manipulation language 数据库操纵语言）语句，即SELECT（除外）、UPDATE、INSERT、DELETE。<br>
@@ -208,6 +273,6 @@ public interface BaseDao {
 	 * @see void org.springframework.jdbc.core.JdbcTemplate.execute(String sql)
 	 *      throws DataAccessException
 	 */
-	public void execute(final String sql) throws DataAccessException;
+	public void execute(String sql) throws DataAccessException;
 
 }

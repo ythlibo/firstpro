@@ -178,6 +178,11 @@ public class JdbcTemplateTest {
 	@Test
 	public void testMapDelete(){
 		//与select语句相同
+		String sql = "delete from employee where id = :id";
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("id", UUIDGenerator.getUUID());
+		int affectedRows = namedParameterJdbcTemplate.update(sql, paramMap);
+		System.out.println(affectedRows);
 	}
 	
 	/**

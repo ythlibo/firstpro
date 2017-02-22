@@ -137,21 +137,57 @@ public class BaseDaoImpl implements BaseDao {
 	public <T> T queryWithRowMapper(String sql, RowMapper<T> rowMapper) throws DataAccessException {
 		return getJdbcTemplate().queryForObject(sql, rowMapper);
 	}
+	
+	@Override
+	public <T> T queryWithRowMapper(String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper) throws Exception {
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryWithRowMapper(newSql,rowMapper);
+		}else{
+			return npJdbcTemplate.queryForObject(newSql, paramMap, rowMapper);
+		}
+	}
 
 	@Override
 	public <T> T queryForBean(String sql, Class<T> requiredType) throws DataAccessException {
 		RowMapper<T> rowMapper = new BeanPropertyRowMapper<T>(requiredType);
 		return getJdbcTemplate().queryForObject(sql, rowMapper);
 	}
+	
+	@Override
+	public <T> T queryForBean(String sql, Map<String, ?> paramMap, Class<T> requiredType) throws Exception {
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForBean(newSql,requiredType);
+		}else{
+			RowMapper<T> rowMapper = new BeanPropertyRowMapper<T>(requiredType);
+			return npJdbcTemplate.queryForObject(newSql, paramMap, rowMapper);
+		}
+	}
 
 	@Override
 	public Map<String, Object> queryForMap(String sql) throws DataAccessException {
 		return getJdbcTemplate().queryForMap(sql);
 	}
+	
+	@Override
+	public Map<String, Object> queryForMap(String sql, Map<String, ?> paramMap) throws Exception {
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForMap(newSql);
+		}else{
+			return npJdbcTemplate.queryForMap(newSql, paramMap);
+		}
+	}
 
 	@Override
 	public String queryForString(String sql) throws DataAccessException {
 		return this.queryForObject(sql, String.class);
+	}
+	
+	@Override
+	public String queryForString(String sql, Map<String, ?> paramMap) throws Exception {
+		return this.queryForObject(sql, paramMap, String.class);
 	}
 
 	@Override
@@ -159,25 +195,43 @@ public class BaseDaoImpl implements BaseDao {
 		return this.queryForObject(sql, Integer.class);
 	}
 
+	public int queryForInt(String sql, Map<String, ?> paramMap) throws Exception{
+		return this.queryForObject(sql, paramMap, Integer.class);
+	}
+	
 	@Override
 	public long queryForLong(String sql) throws DataAccessException {
 		return this.queryForObject(sql, Long.class);
 	}
 
+	public long queryForLong(String sql, Map<String, ?> paramMap) throws Exception{
+		return this.queryForObject(sql, paramMap, Long.class);
+	}
+	
 	@Override
 	public <T> T queryForObject(String sql, Class<T> requiredType) throws DataAccessException {
 		return getJdbcTemplate().queryForObject(sql, requiredType);
 	}
+	
+	@Override
+	public <T> T queryForObject(String sql, Map<String, ?> paramMap, Class<T> requiredType) throws Exception{
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForObject(newSql, requiredType);
+		}else{
+			return npJdbcTemplate.queryForObject(newSql, paramMap, requiredType);
+		}
+	}
 
 	@Override
-	public int updateOrInsertOrDelete(final String sql) throws DataAccessException {
+	public int updateOrInsertOrDelete(String sql) throws DataAccessException {
 		return getJdbcTemplate().update(sql);
 	}
 
 	@Override
 	public int updateOrInsertOrDelete(String sql, Map<String, ?> paramMap) throws Exception{
 		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
-		if((sql!=null&&sql.equals(newSql)) || paramMap==null || paramMap.isEmpty()){
+		if(paramMap==null || paramMap.isEmpty()){
 			return this.updateOrInsertOrDelete(newSql);
 		}else{
 			return npJdbcTemplate.update(newSql, paramMap);
@@ -200,7 +254,7 @@ public class BaseDaoImpl implements BaseDao {
 	}
 	
 	@Override
-	public void execute(final String sql) throws DataAccessException {
+	public void execute(String sql) throws DataAccessException {
 		getJdbcTemplate().execute(sql);
 	}
 

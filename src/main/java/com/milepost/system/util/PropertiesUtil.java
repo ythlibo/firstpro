@@ -27,20 +27,34 @@ public class PropertiesUtil {
 	//属性文件的路径，相对与类路径，默认是类路径下的config.properties文件
 	static String propertiesFilePath = classPath + "config.properties";
 	
-    /**  
-    * 根据主键key读取主键的值value，没有则返回null  
-    * @param filePath 属性文件的名称，默认是  “config.properties”，即类路径下的config.properties文件，
-    * 也可以带有文件夹路径的，如“”
-    * @param key 键名  
-    */
+    /**
+     * 去默认的配置文件(类路径下的config.properties文件)中获取指定key的值，
+     * @param key
+     * @return 返回value，不存在则返回null
+     */
 	public static String getByKey(String key) {  
-		return getByKey(propertiesFilePath, key);
+		return getByKey(propertiesFilePath, key, null);
 	}
+	
+	/**
+	 * 去默认的配置文件(类路径下的config.properties文件)中获取指定key的值，如果不存在则返回defaultValue
+	 * @param key
+	 * @param defaultValue
+	 * @return 
+	 */
 	public static String getByKey(String key, String defaultValue ) {
-		String result = getByKey(propertiesFilePath, key); 
+		String result = getByKey(propertiesFilePath, key, defaultValue); 
 		return result==null?defaultValue:result;
 	}
-    public static String getByKey(String filePath, String defaultValue, String key) {   
+	
+	/**
+	 * 去指定名称的配置文件中获取指定key的值，如果不存在则返回defaultValue
+	 * @param filePath 属性文件的绝对路径，可以使用PropertiesUtil.classPath + "类路径下的文件名"
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
+    public static String getByKey(String filePath, String key, String defaultValue) {   
         Properties props = new Properties(); 
         String value = null;
         InputStream inputStream = null;

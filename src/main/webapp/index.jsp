@@ -3,7 +3,7 @@
 <% 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	logger.debug("jsp页面输出的日志");    
-%>  
+%>   
 <html>
 <body> 
 <h2>Hello World!</h2>

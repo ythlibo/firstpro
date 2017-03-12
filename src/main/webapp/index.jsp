@@ -2,10 +2,10 @@
 <%@ page import="org.slf4j.*" %>
 <% 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	logger.debug("jsp页面输出的日志");
-%>
+	logger.debug("jsp页面输出的日志");    
+%>  
 <html>
-<body>
+<body> 
 <h2>Hello World!</h2>
 <a href="employee/testLogger">Test Logger</a>
 </body> 

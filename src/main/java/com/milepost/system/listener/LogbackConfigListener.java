@@ -15,7 +15,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
  * @author HRF
  */
 public class LogbackConfigListener implements ServletContextListener {
-	private static final Logger log = LoggerFactory.getLogger(LogbackConfigListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(LogbackConfigListener.class);
 
 	public void contextInitialized(ServletContextEvent event) {
 		String logbackConfigLocation = event.getServletContext().getInitParameter("logbackConfigLocation");
@@ -26,10 +26,10 @@ public class LogbackConfigListener implements ServletContextListener {
 			JoranConfigurator joranConfigurator = new JoranConfigurator();
 			joranConfigurator.setContext(loggerContext);
 			joranConfigurator.doConfigure(fileRealPath);
-			log.debug("loaded slf4j configure file from {}", fileRealPath);
+			logger.debug("Loaded slf4j configure file from {}.", fileRealPath);
 		} catch (JoranException e) { 
 			e.printStackTrace();
-			log.error("can't loading slf4j configure file from {}" + fileRealPath, e);
+			logger.error("Can't loading slf4j configure file from {}." + fileRealPath, e);
 		}
 	}
 

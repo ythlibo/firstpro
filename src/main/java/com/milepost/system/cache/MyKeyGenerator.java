@@ -14,7 +14,7 @@ import com.milepost.system.util.StringUtil;
  */ 
 public class MyKeyGenerator implements KeyGenerator{
 
-	private static final Logger log = LoggerFactory.getLogger(MyKeyGenerator.class);
+	private static final Logger logger = LoggerFactory.getLogger(MyKeyGenerator.class);
 	
 	/**
 	 * Object arg0：目标对象
@@ -27,7 +27,7 @@ public class MyKeyGenerator implements KeyGenerator{
 		String params = StringUtil.arr2Str(arg2,",");
 		//因为 Service 由Spring的IOC容器管理，而默认情况下，IOC容器中所有的bean都是单例的，所以所有的 HashCode 是一样的，这里也可以不加 HashCode
 		String key = className + "@" + arg0.hashCode() + "." + mname + "("+params+")" ;
-		log.info("读取key为{}的缓存数据...",key);
+		logger.info("Read cache data for ["+ key +"].");
 		return key;
 	}
 

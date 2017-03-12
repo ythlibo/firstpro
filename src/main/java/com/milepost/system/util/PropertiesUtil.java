@@ -64,12 +64,12 @@ public class PropertiesUtil {
             props.load(inputStream);   
             value = props.getProperty(key);   
         } catch (Exception e) {   
-        	logger.error("PropertiesUtil#getByKey{}..." +  "filePath:" + filePath + ";key:" + key, e);
+        	logger.error("filePath:" + filePath + ";key:" + key, e);
         }finally{
         	try {
 				inputStream.close();
 			} catch (Exception e) {
-				logger.error("PropertiesUtil#getByKey-close{}..." +  "filePath:" + filePath + ";key:" + key, e);
+				logger.error("filePath:" + filePath + ";key:" + key, e);
 			}
         }
         return value==null?defaultValue:value;   
@@ -98,13 +98,13 @@ public class PropertiesUtil {
             properties.store(outputStream, null);   
             result = true;
     	} catch (Exception e) {   
-        	logger.error("PropertiesUtil#writeProperties{}..." +  "filePath:" + filePath + ";key:" + key + ";value:" + value, e);
+        	logger.error("filePath:" + filePath + ";key:" + key + ";value:" + value, e);
         	result = false;
         }finally {
 			try {
 				outputStream.close();
 			} catch (IOException e) {
-				logger.error("PropertiesUtil#writeProperties-close{}..." +  "filePath:" + filePath + ";key:" + key + ";value:" + value, e);
+				logger.error("filePath:" + filePath + ";key:" + key + ";value:" + value, e);
 				result = false;
 			}
 		}
@@ -139,19 +139,19 @@ public class PropertiesUtil {
         	properties.store(outputStream,null);  
         	result = true;
         } catch (Exception e) {   
-        	logger.error("PropertiesUtil#updateProperties{}..." +  "filePath:" + filePath + ";key:" + key + ";value:" + value, e);
+        	logger.error("filePath:" + filePath + ";key:" + key + ";value:" + value, e);
         	result = false;
         }finally{
         	try {
 				inputStream.close();
 			} catch (Exception e) {
-				logger.error("PropertiesUtil#updateProperties{}-close..." +  "filePath:" + filePath + ";key:" + key + ";value:" + value, e);
+				logger.error("filePath:" + filePath + ";key:" + key + ";value:" + value, e);
 				result = false;
 			}
         	try {
 				outputStream.close();
 			} catch (Exception e) {
-				logger.error("PropertiesUtil#updateProperties{}-close..." +  "filePath:" + filePath + ";key:" + key + ";value:" + value, e);
+				logger.error("filePath:" + filePath + ";key:" + key + ";value:" + value, e);
 				result = false;
 			}
         }  

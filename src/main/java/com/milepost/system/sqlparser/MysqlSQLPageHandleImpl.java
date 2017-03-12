@@ -24,8 +24,8 @@ public class MysqlSQLPageHandleImpl implements SQLPageHandle {
 	public String handlerPagingSQL(String oldSql, int pageNo, int pageSize){
 		boolean isDebug = logger.isDebugEnabled();
 		if (isDebug) {
-			logger.debug("Paging parameter [oldSql="+ oldSql +"; pageNo="+ pageNo +"; pageSize="+ pageSize +"]");
-			logger.debug("Before paging sql ["+ oldSql +"]");
+			logger.debug("HandlerPagingSQL parameter [oldSql="+ oldSql +"; pageNo="+ pageNo +"; pageSize="+ pageSize +"].");
+			logger.debug("Before handlerPagingSQL sql ["+ oldSql +"].");
 		}
 		StringBuffer sql = new StringBuffer(oldSql);
 		if(pageNo<=0){
@@ -41,7 +41,7 @@ public class MysqlSQLPageHandleImpl implements SQLPageHandle {
 		}
 		String newSql = sql.toString();
 		if (isDebug) {
-			logger.debug("After paging sql ["+ newSql +"]");
+			logger.debug("After handlerPagingSQL sql ["+ newSql +"].");
 		}
 		return newSql;
 	}

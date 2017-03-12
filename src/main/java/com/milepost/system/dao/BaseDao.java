@@ -13,8 +13,6 @@ import com.milepost.system.sqlparser.Page;
  */
 public interface BaseDao {
 
-	
-
 	/**
 	 * 查询不分页的列表
 	 * @param sql
@@ -23,6 +21,16 @@ public interface BaseDao {
 	 * @throws DataAccessException
 	 */
 	public <T> List<T> queryForList(String sql, RowMapper<T> rowMapper) throws DataAccessException;
+	
+	/**
+	 * 查询不分页的列表
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @param rowMapper 自己实现的RowMapper，用来指定如何封装结果集
+	 * @return
+	 * @throws Exception
+	 */
+	public <T> List<T> queryForList(String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper) throws Exception;
 	
 	/**
 	 * 查询分页的列表
@@ -36,6 +44,18 @@ public interface BaseDao {
 	public <T> Page<T> queryForListPagination(String sql, int pageNo, int pageSize, RowMapper<T> rowMapper) throws DataAccessException;
 	
 	/**
+	 * 查询分页的列表
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @param pageNo 页码
+	 * @param pageSize 每页记录数
+	 * @param rowMapper 自己实现的RowMapper，用来指定如何封装结果集
+	 * @return
+	 * @throws Exception
+	 */
+	public <T> Page<T> queryForListPagination(String sql, Map<String, ?> paramMap, int pageNo, int pageSize, RowMapper<T> rowMapper) throws Exception;
+	
+	/**
 	 * 查询不分页的列表
 	 * @param sql
 	 * @param requiredType
@@ -43,6 +63,16 @@ public interface BaseDao {
 	 * @throws DataAccessException
 	 */
 	public <T> List<T> queryForList(String sql, Class<T> requiredType) throws DataAccessException;
+	
+	/**
+	 * 查询不分页的列表
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @param requiredType
+	 * @return 结果集中存放指定的类型的元素
+	 * @throws Exception
+	 */
+	public <T> List<T> queryForList(String sql, Map<String, ?> paramMap, Class<T> requiredType) throws Exception;
 	
 	/**
 	 * 查询分页的列表
@@ -56,12 +86,33 @@ public interface BaseDao {
 	public <T> Page<T> queryForListPagination(String sql, int pageNo, int pageSize, Class<T> requiredType) throws DataAccessException;
 	
 	/**
+	 * 查询分页的列表
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @param pageNo 页码
+	 * @param pageSize 每页记录数
+	 * @param requiredType 
+	 * @return Page中的结果集中存放指定的类型的元素
+	 * @throws Exception
+	 */
+	public <T> Page<T> queryForListPagination(String sql, Map<String, ?> paramMap, int pageNo, int pageSize, Class<T> requiredType) throws Exception;
+	
+	/**
 	 * 查询不分页的列表
 	 * @param sql
 	 * @return 
 	 * @throws DataAccessException
 	 */
 	public List<Map<String, Object>> queryForList(String sql) throws DataAccessException;
+
+	/**
+	 * 查询不分页的列表
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @return 
+	 * @throws Exception
+	 */
+	public List<Map<String, Object>> queryForList(String sql, Map<String, ?> paramMap) throws Exception;
 	
 	/**
 	 * 查询分页的列表
@@ -73,6 +124,16 @@ public interface BaseDao {
 	 */
 	public Page<Map<String, Object>> queryForListPagination(String sql, int pageNo, int pageSize) throws DataAccessException;
 	
+	/**
+	 * 查询分页的列表
+	 * @param sql
+	 * @param paramMap 参数Map
+	 * @param pageNo 页码
+	 * @param pageSize 每页记录数
+	 * @return Page 对象，可封装了结果集和各种分页信息，其中结果集是List<Map<String, Object>>类型
+	 * @throws Exception
+	 */
+	public Page<Map<String, Object>> queryForListPagination(String sql, Map<String, ?> paramMap, int pageNo, int pageSize) throws Exception;
 	
 	/**
 	 * 单行查询
@@ -89,7 +150,7 @@ public interface BaseDao {
 	 * @param paramMap 参数Map
 	 * @param rowMapper 自己实现的RowMapper，用来指定如何封装结果集
 	 * @return
-	 * @throws DataAccessException
+	 * @throws Exception
 	 */
 	public <T> T queryWithRowMapper(String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper) throws Exception;
 	
@@ -108,7 +169,7 @@ public interface BaseDao {
 	 * @param paramMap 参数Map
 	 * @param requiredType
 	 * @return 指定的类型
-	 * @throws DataAccessException
+	 * @throws Exception
 	 */
 	public <T> T queryForBean(String sql, Map<String, ?> paramMap, Class<T> requiredType) throws Exception;
 	
@@ -125,7 +186,7 @@ public interface BaseDao {
 	 * @param sql 
 	 * @param paramMap 参数Map
 	 * @return Map<String, Object>的key为sql中列的别名的大写形式
-	 * @throws DataAccessException
+	 * @throws Exception
 	 */
 	public Map<String, Object> queryForMap(String sql, Map<String, ?> paramMap) throws Exception;
 	
@@ -142,7 +203,7 @@ public interface BaseDao {
 	 * @param sql
 	 * @param paramMap 参数Map
 	 * @return 
-	 * @throws DataAccessException
+	 * @throws Exception
 	 */
 	public String queryForString(String sql, Map<String, ?> paramMap) throws Exception;
 	
@@ -159,7 +220,7 @@ public interface BaseDao {
 	 * @param sql
 	 * @param paramMap 参数Map
 	 * @return
-	 * @throws DataAccessException
+	 * @throws Exception
 	 */
 	public int queryForInt(String sql, Map<String, ?> paramMap) throws Exception;
 	
@@ -176,7 +237,7 @@ public interface BaseDao {
 	 * @param sql
 	 * @param paramMap 参数Map
 	 * @return
-	 * @throws DataAccessException
+	 * @throws Exception
 	 */
 	public long queryForLong(String sql, Map<String, ?> paramMap) throws Exception;
 	
@@ -195,7 +256,7 @@ public interface BaseDao {
 	 * @param paramMap 参数Map
 	 * @param requiredType 指定的返回值类型
 	 * @return
-	 * @throws DataAccessException
+	 * @throws Exception
 	 */
 	public <T> T queryForObject(String sql, Map<String, ?> paramMap, Class<T> requiredType) throws Exception;
 	
@@ -221,7 +282,7 @@ public interface BaseDao {
 	 * @param sql
 	 * @param paramMap 参数Map
 	 * @return sql语句执行结果影响的行数
-	 * @throws DataAccessException
+	 * @throws Exception
 	 * 
 	 * @see int org.springframework.jdbc.core.JdbcTemplate.update(String sql)
 	 *      throws DataAccessException
@@ -249,6 +310,8 @@ public interface BaseDao {
 	 * @param batchArgs 参数集合
 	 * @return 本方法的返回值并不可靠，可能与数据库驱动包和spring的版本有关，有时候只是简单的返回一组-2，但数据确操作成功了。
 	 * @throws DataAccessException
+	 * 
+	 * @see public int[] batchUpdate(String sql, List<Object[]> batchArgs) throws DataAccessException
 	 */
 	public int[] batchUpdateOrInsertOrDelete(String sql, List<Object[]> batchArgs) throws DataAccessException;
 
@@ -261,6 +324,8 @@ public interface BaseDao {
 	 * @param argTypes 参数类型
 	 * @return 本方法的返回值并不可靠，可能与数据库驱动包和spring的版本有关，有时候只是简单的返回一组-2，但数据确操作成功了。
 	 * @throws DataAccessException
+	 * 
+	 * @see public int[] batchUpdate(String sql, List<Object[]> batchArgs, int[] argTypes) throws DataAccessException
 	 */
 	public int[] batchUpdateOrInsertOrDelete(String sql, List<Object[]> batchArgs, int[] argTypes) throws DataAccessException;
 	

@@ -80,7 +80,7 @@ public class DateUtil {
 		try {
 			strTimeString = formatter.format(date);
 		} catch (Exception e) {
-			logger.error("DateUtil#date2Str{}..." + "date:" + date + ";formatSymbols:" + formatSymbols, e);
+			logger.error("date:" + date + ";formatSymbols:" + formatSymbols, e);
 		}
 		return strTimeString;
 	}
@@ -110,7 +110,7 @@ public class DateUtil {
 		try {
 			result = parseSdf.parse(timeValue).getTime();
 		} catch (Exception e) {
-			logger.error("DateUtil#str2Date{}..." +  "timeFormat:" + timeFormat + ";timeValue:" + timeValue, e);
+			logger.error("timeFormat:" + timeFormat + ";timeValue:" + timeValue, e);
 			return null;
 		}
 		return new Date(result);
@@ -125,7 +125,7 @@ public class DateUtil {
 		try {
 			result = DateUtils.parseDate(timeValue, parsers);
 		} catch (Exception e) {
-			logger.error("DateUtil#str2Date{}..." +  "parsers:" + parsers + ";timeValue:" + timeValue, e);
+			logger.error("parsers:" + parsers + ";timeValue:" + timeValue, e);
 			return null;
 		}
 		return result;
@@ -136,7 +136,7 @@ public class DateUtil {
 		try {
 			result = DateUtils.parseDate(timeValue, DEFAULT_PARSERS);
 		} catch (Exception e) {
-			logger.error("DateUtil#str2Date{}..." +  "parsers:" + DEFAULT_PARSERS + ";timeValue:" + timeValue, e);
+			logger.error("parsers:" + DEFAULT_PARSERS + ";timeValue:" + timeValue, e);
 			return null;
 		}
 		return result;

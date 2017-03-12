@@ -24,8 +24,9 @@ public class ParserSqlToDynamic {
 	public static String parserSelect2Count(String sql){
 		if(sql == null)return sql;
 		sql = sql.trim();
-		//sql = Pattern.compile("(?i)^select(.*?)from").matcher(sql).replaceAll("select count(*) totalRows from");
-		sql = Pattern.compile("(?i)^select.*?from").matcher(sql).replaceAll("select count(*) totalRows from");
+		//这样就不支持group by了
+		//sql = Pattern.compile("(?i)^select.*?from").matcher(sql).replaceAll("select count(*) totalRows from");
+		sql = "select count(*) totalRows from ("+ sql +") tmp"; 
 		return sql;
 	}
 	
@@ -55,8 +56,8 @@ public class ParserSqlToDynamic {
 	public static String parserSql(String sql, Map<String,?> paramMap) throws Exception{
 		boolean isDebug = logger.isDebugEnabled();
 		if (isDebug) {
-			logger.debug("ParserSql parameter " + paramMap);
-			logger.debug("Before parserSql sql ["+ sql +"]");
+			logger.debug("ParserSql parameter " + paramMap + ".");
+			logger.debug("Before parserSql sql ["+ sql +"].");
 		}
 		if(sql == null){
 			return null;
@@ -76,7 +77,7 @@ public class ParserSqlToDynamic {
 			boolean paramType = getParamType(sqlCharArray,startIndex,endIndex);
 			if(paramType){
 				if (isDebug) {
-					logger.debug(paramName + " is optional");
+					logger.debug(paramName + " is optional.");
 				}
 				//如果是可选参数，则判断paramMap中是否存在此参数，判断规则为paramMap.get(paramName) != null
 				if(paramMap!=null && paramMap.get(paramName) != null){
@@ -103,17 +104,17 @@ public class ParserSqlToDynamic {
 				}
 			}else{
 				if (isDebug) {
-					logger.debug(paramName + " is required");
+					logger.debug(paramName + " is required.");
 				}
 				//如果是必选参数，则可以判断paramMap.get(paramName) != null，然后抛出相应的异常，也可以什么都不做，然后让springjdbc自己处理是否抛出异常
 				if(paramMap==null || paramMap.get(paramName) == null){
-					throw new Exception("In parameter map(" + paramMap + "),there is not a value for parameter '" + paramName + "'");
+					throw new Exception("In parameter map" + paramMap + ", there is not a value for parameter '" + paramName + "'.");
 				}
 			}
 		}
 		String newSql = String.valueOf(sqlCharArray);
 		if (isDebug) {
-			logger.debug("After parserSql sql ["+ newSql +"]");
+			logger.debug("After parserSql sql ["+ newSql +"].");
 		}
 		return newSql;
 	}

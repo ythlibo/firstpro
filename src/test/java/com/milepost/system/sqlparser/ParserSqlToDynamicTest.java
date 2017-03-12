@@ -5,8 +5,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.milepost.system.util.UUIDGenerator;
-
 public class ParserSqlToDynamicTest {
 
 	/**

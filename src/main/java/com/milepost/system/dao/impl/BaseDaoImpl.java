@@ -14,14 +14,12 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 
 import com.milepost.system.dao.BaseDao;
 import com.milepost.system.sqlparser.Page;
 import com.milepost.system.sqlparser.ParserSqlToDynamic;
 import com.milepost.system.sqlparser.SQLPageHandle;
 
-@Repository
 public class BaseDaoImpl implements BaseDao {
 
 	private static Logger logger = LoggerFactory.getLogger(BaseDaoImpl.class);
@@ -42,15 +40,6 @@ public class BaseDaoImpl implements BaseDao {
 	private NamedParameterJdbcTemplate npJdbcTemplate;
 
 	/**
-	 * 只允许使用“?”占位符的sql语句
-	 */
-	// @Autowired，不用注入，可通过NamedParameterJdbcTemplate获取
-	// private JdbcTemplate jdbcTemplate;
-	private JdbcTemplate getJdbcTemplate() {
-		return (JdbcTemplate) npJdbcTemplate.getJdbcOperations();
-	}
-
-	/**
 	 * 分页
 	 */
 	@Resource(name = "mysqlSQLPageHandleImpl")
@@ -58,18 +47,51 @@ public class BaseDaoImpl implements BaseDao {
 	@Resource(name = "oracleSQLPageHandleImpl")
 	protected SQLPageHandle oracleSQLPageHandle;
 
+	
+	/**
+	 * 只允许使用“?”占位符的sql语句
+	 */
+	// @Autowired，不用注入，可通过NamedParameterJdbcTemplate获取
+	// private JdbcTemplate jdbcTemplate;
+	private JdbcTemplate getJdbcTemplate() {
+		return (JdbcTemplate) npJdbcTemplate.getJdbcOperations();
+	}
+	
+	/**
+	 * 对sql语句进行分页处理，暂时支持Oracle和MySql，如果是其他数据库，返回原sql
+	 * @param newSql
+	 * @param pageNo
+	 * @param pageSize
+	 * @return
+	 */
+	private String handlerPagingSql(String sql, int pageNo, int pageSize) {
+		String newSql  = sql;
+		String dialect = this.getDialect();
+		if(DIALECT_ORACLE.equals(dialect)){
+			newSql = oracleSQLPageHandle.handlerPagingSQL(newSql, pageNo, pageSize);
+		}else if(DIALECT_MYSQL.equals(dialect)){
+			newSql = mysqlSQLPageHandle.handlerPagingSQL(newSql, pageNo, pageSize);
+		}else{
+			if (logger.isDebugEnabled()) {
+				logger.debug("Paging processing for [" + dialect + "] database is not supported.");
+			}
+		}
+		return newSql;
+	}
+	
 	/**
 	 * 获取数据库方言，Oracle、MySQL
-	 * 
-	 * @return
 	 */
 	private String getDialect() {
 		String dialect = null;
 		try {
 			DatabaseMetaData databaseMetaData = getJdbcTemplate().getDataSource().getConnection().getMetaData();
 			dialect = databaseMetaData.getDatabaseProductName();// Oracle、MySQL
+			if (logger.isDebugEnabled()) {
+				logger.debug( getClass().getName() + " is injected [" + dialect + "] datasource.");
+			}
 		} catch (Exception e) {
-			logger.error("GetDialect occur exception", e);
+			logger.error("SetDialect occur exception.", e);
 		}
 		return dialect;
 	}
@@ -78,19 +100,40 @@ public class BaseDaoImpl implements BaseDao {
 	public <T> List<T> queryForList(String sql, RowMapper<T> rowMapper) throws DataAccessException {
 		return getJdbcTemplate().query(sql, rowMapper);//注意，这里不是queryForList;
 	}
+	
+	@Override
+	public <T> List<T> queryForList(String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper) throws Exception {
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForList(newSql, rowMapper);//注意，这里不是queryForList;
+		}else{
+			return npJdbcTemplate.query(newSql, paramMap, rowMapper);//注意，这里不是queryForList;
+		}
+	}
 
 	@Override
 	public <T> Page<T> queryForListPagination(String sql, int pageNo, int pageSize, RowMapper<T> rowMapper)
 			throws DataAccessException {
 		int totalRows = this.queryForInt(ParserSqlToDynamic.parserSelect2Count(sql));
-		if(DIALECT_ORACLE.equals(this.getDialect())){
-			sql = oracleSQLPageHandle.handlerPagingSQL(sql, pageNo, pageSize);
-		}else if(DIALECT_MYSQL.equals(this.getDialect())){
-			sql = mysqlSQLPageHandle.handlerPagingSQL(sql, pageNo, pageSize);
-		}
+		sql = handlerPagingSql(sql, pageNo, pageSize);
 		List<T> list = getJdbcTemplate().query(sql, rowMapper);//注意，这里不是queryForList
 	    Page<T> page = new Page<T>(pageNo, pageSize, totalRows, list);
 	    return page;
+	}
+	
+	@Override
+	public <T> Page<T> queryForListPagination(String sql, Map<String, ?> paramMap, int pageNo, int pageSize, RowMapper<T> rowMapper)
+			throws Exception {
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForListPagination(newSql, pageNo, pageSize, rowMapper);
+		}else{
+			int totalRows = this.queryForInt(ParserSqlToDynamic.parserSelect2Count(newSql), paramMap);
+			newSql = handlerPagingSql(newSql, pageNo, pageSize);
+			List<T> list = npJdbcTemplate.query(newSql, paramMap, rowMapper);//注意，这里不是queryForList
+		    Page<T> page = new Page<T>(pageNo, pageSize, totalRows, list);
+		    return page;
+		}
 	}
 
 	@Override
@@ -98,20 +141,45 @@ public class BaseDaoImpl implements BaseDao {
 		RowMapper<T> rowMapper = new BeanPropertyRowMapper<T>(requiredType);
 		return getJdbcTemplate().query(sql, rowMapper);//注意，这里不是queryForList
 	}
+	
+	@Override
+	public <T> List<T> queryForList(String sql, Map<String, ?> paramMap, Class<T> requiredType) throws Exception {
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForList(newSql, requiredType);
+		}else{
+			RowMapper<T> rowMapper = new BeanPropertyRowMapper<T>(requiredType);
+			return npJdbcTemplate.query(newSql, paramMap, rowMapper);//注意，这里不是queryForList
+		}
+	}
+	
+	
 
 	@Override
 	public <T> Page<T> queryForListPagination(String sql, int pageNo, int pageSize, Class<T> requiredType)
 			throws DataAccessException {
 		int totalRows = this.queryForInt(ParserSqlToDynamic.parserSelect2Count(sql));
-		if(DIALECT_ORACLE.equals(this.getDialect())){
-			sql = oracleSQLPageHandle.handlerPagingSQL(sql, pageNo, pageSize);
-		}else if(DIALECT_MYSQL.equals(this.getDialect())){
-			sql = mysqlSQLPageHandle.handlerPagingSQL(sql, pageNo, pageSize);
-		}
+		sql = handlerPagingSql(sql, pageNo, pageSize);
 		RowMapper<T> rowMapper = new BeanPropertyRowMapper<T>(requiredType);
 		List<T> list = getJdbcTemplate().query(sql, rowMapper);//注意，这里不是queryForList
 	    Page<T> page = new Page<T>(pageNo, pageSize, totalRows, list);
 	    return page;
+	}
+	
+	@Override
+	public <T> Page<T> queryForListPagination(String sql, Map<String, ?> paramMap, int pageNo, int pageSize, Class<T> requiredType) 
+			throws Exception{
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForListPagination(newSql, pageNo, pageSize, requiredType);
+		}else{
+			int totalRows = this.queryForInt(ParserSqlToDynamic.parserSelect2Count(newSql), paramMap);
+			newSql = handlerPagingSql(newSql, pageNo, pageSize);
+			RowMapper<T> rowMapper = new BeanPropertyRowMapper<T>(requiredType);
+			List<T> list = npJdbcTemplate.query(newSql, paramMap, rowMapper);//注意，这里不是queryForList
+		    Page<T> page = new Page<T>(pageNo, pageSize, totalRows, list);
+		    return page;
+		}
 	}
 
 	@Override
@@ -120,17 +188,38 @@ public class BaseDaoImpl implements BaseDao {
 	}
 
 	@Override
+	public List<Map<String, Object>> queryForList(String sql, Map<String, ?> paramMap) throws Exception{
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForList(newSql);
+		}else{
+			return npJdbcTemplate.queryForList(newSql, paramMap);
+		}
+	}
+	
+	@Override
 	public Page<Map<String, Object>> queryForListPagination(String sql, int pageNo, int pageSize)
 			throws DataAccessException {
 		int totalRows = this.queryForInt(ParserSqlToDynamic.parserSelect2Count(sql));
-		if(DIALECT_ORACLE.equals(this.getDialect())){
-			sql = oracleSQLPageHandle.handlerPagingSQL(sql, pageNo, pageSize);
-		}else if(DIALECT_MYSQL.equals(this.getDialect())){
-			sql = mysqlSQLPageHandle.handlerPagingSQL(sql, pageNo, pageSize);
-		}
+		sql = handlerPagingSql(sql, pageNo, pageSize);
 		List<Map<String, Object>> list = getJdbcTemplate().queryForList(sql);
 	    Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageNo, pageSize, totalRows, list);
 	    return page;
+	}
+	
+	@Override
+	public Page<Map<String, Object>> queryForListPagination(String sql, Map<String, ?> paramMap, int pageNo, int pageSize) 
+			throws Exception{
+		String newSql = ParserSqlToDynamic.parserSql(sql, paramMap);
+		if(paramMap==null || paramMap.isEmpty()){
+			return this.queryForListPagination(newSql, pageNo, pageSize);
+		}else{
+			int totalRows = this.queryForInt(ParserSqlToDynamic.parserSelect2Count(newSql), paramMap);
+			newSql = this.handlerPagingSql(newSql, pageNo, pageSize);
+			List<Map<String, Object>> list = npJdbcTemplate.queryForList(newSql, paramMap);
+		    Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageNo, pageSize, totalRows, list);
+		    return page;
+		}
 	}
 
 	@Override
@@ -257,5 +346,5 @@ public class BaseDaoImpl implements BaseDao {
 	public void execute(String sql) throws DataAccessException {
 		getJdbcTemplate().execute(sql);
 	}
-
+	
 }

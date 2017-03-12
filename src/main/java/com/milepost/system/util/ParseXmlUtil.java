@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,6 +20,8 @@ import org.w3c.dom.NodeList;
 
 public class ParseXmlUtil {
 
+	private static Logger logger = LoggerFactory.getLogger(ParseXmlUtil.class);
+	
 	/**
 	 * 将xmlStr转成List<Map<String, String>>
 	 * @param xmlStr 
@@ -77,7 +81,7 @@ public class ParseXmlUtil {
 				list.add(map);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return list;
 	}
@@ -129,7 +133,7 @@ public class ParseXmlUtil {
 				map.put(nodeName, nodeValue);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return map;
 	}
@@ -163,7 +167,7 @@ public class ParseXmlUtil {
 			InputStream stream = new ByteArrayInputStream(xmlStr.getBytes(encoding));
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stream);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return doc;
 	}

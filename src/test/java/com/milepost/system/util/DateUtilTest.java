@@ -1,6 +1,7 @@
 package com.milepost.system.util;
 
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.Test;
@@ -35,5 +36,12 @@ public class DateUtilTest {
 		String dateStr3 = "1972-12-22 12:12:21";
 		Date date3 = DateUtils.parseDate(dateStr3, parsers);
 		System.out.println(date3);
+	}
+	
+	@Test
+	public void test11(){
+		String path = "/appApi/userandpass/list.htm";
+		path = Pattern.compile("\\.htm$").matcher(path).replaceAll("");//去掉结尾的“.htm”
+		System.out.println(path);
 	}
 }

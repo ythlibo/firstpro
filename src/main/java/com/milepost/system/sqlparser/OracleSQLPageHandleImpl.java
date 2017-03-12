@@ -25,8 +25,8 @@ public class OracleSQLPageHandleImpl implements SQLPageHandle {
 	public String handlerPagingSQL(String oldSql, int pageNo, int pageSize){
 		boolean isDebug = logger.isDebugEnabled();
 		if (isDebug) {
-			logger.debug("Paging parameter [oldSql="+ oldSql +"; pageNo="+ pageNo +"; pageSize="+ pageSize +"]");
-			logger.debug("Before paging sql ["+ oldSql +"]");
+			logger.debug("HandlerPagingSQL parameter [oldSql="+ oldSql +"; pageNo="+ pageNo +"; pageSize="+ pageSize +"].");
+			logger.debug("Before handlerPagingSQL sql ["+ oldSql +"].");
 		}
 		if (pageSize > 0) {
 			int startResult = (pageNo-1)*pageSize;
@@ -41,7 +41,7 @@ public class OracleSQLPageHandleImpl implements SQLPageHandle {
 			}
 		}
 		if (isDebug) {
-			logger.debug("After paging sql ["+ oldSql +"]");
+			logger.debug("After handlerPagingSQL sql ["+ oldSql +"].");
 		}
 		return oldSql;
 	}

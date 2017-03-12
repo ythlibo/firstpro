@@ -10,6 +10,28 @@ import org.junit.Test;
 
 public class TestJsonUtil {
 
+	
+	@Test
+	public void test1(){
+		int a = 3;
+		a = a++;//先赋值，后++
+		System.out.println(a);//3
+		
+		int b = 3;
+		b++;//没有赋值，直接++
+		System.out.println(b);//4
+		
+		int c = 3;
+		c = ++c;//先++，后赋值
+		System.out.println(c);//4
+		
+		int d = 3;
+		++d;//没有赋值，直接++
+		System.out.println(d);//4
+	}
+	
+	
+	
 	@Test
 	public void testJsonArray2List(){
 		String json = readFileContent("C:/Users/HRF/Desktop/TestPicture/jsonArray.txt");

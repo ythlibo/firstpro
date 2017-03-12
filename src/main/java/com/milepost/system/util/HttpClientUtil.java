@@ -72,7 +72,7 @@ public class HttpClientUtil {
 					.loadTrustMaterial(getKeyStore(keyStoreFilePath, keyStorePassword), new TrustSelfSignedStrategy())
 					.build();
 		} catch (Exception e) {
-			logger.error("HttpClientUtil static block occur exception", e);
+			logger.error(e.getMessage(),e);
 		}
 		// 创建连接的Registry
 		Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
@@ -182,7 +182,7 @@ public class HttpClientUtil {
 			int statusCode = response.getStatusLine().getStatusCode();
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("statusCode : " + statusCode);
+				logger.debug("statusCode : " + statusCode + ".");
 			}
 
 			entity = response.getEntity();
@@ -249,7 +249,7 @@ public class HttpClientUtil {
 			
 			int statusCode = response.getStatusLine().getStatusCode();
 			if (logger.isDebugEnabled()) {
-				logger.debug("statusCode : " + statusCode);
+				logger.debug("statusCode : " + statusCode + ".");
 			}
 
 			entity = response.getEntity();
@@ -310,7 +310,7 @@ public class HttpClientUtil {
 			
 			int statusCode = response.getStatusLine().getStatusCode();
 			if (logger.isDebugEnabled()) {
-				logger.debug("statusCode : " + statusCode);
+				logger.debug("statusCode : " + statusCode + ".");
 			}
 
 			entity = response.getEntity();
@@ -361,7 +361,7 @@ public class HttpClientUtil {
 
 			int statusCode = response.getStatusLine().getStatusCode();
 			if (logger.isDebugEnabled()) {
-				logger.debug("statusCode : " + statusCode);
+				logger.debug("statusCode : " + statusCode + ".");
 			}
 
 			entity = response.getEntity();

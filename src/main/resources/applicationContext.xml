@@ -71,42 +71,13 @@
 		
 		<!-- 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出SQLException，如设为0则无限期等待。单位毫秒。默认: 0 -->   
 		<!-- <property name="checkoutTimeout" value="100" /> -->
-		
 	</bean>
 	
 	
 	<!--2. 操作数据库相关，可以使用MyBatis，也可以使用Spring 的 JdbcTemplate,
 		Spring 的 JdbcTemplate 与 MyBatis 的 SqlSessionFactoryBean 是同等级别的，大项目中用 SqlSessionFactoryBean ，
 		小项目中用 JdbcTemplate，可以将 JdbcTemplate 可以注入到 dao 中，然后直接使用其中的方法，无需做什么关闭操作
-	 
-		A.配置 MyBatis 
-		A.1. 配置MyBatis的sqlSessionFactory，mybatis的SqlSession的工厂: SqlSessionFactoryBean 
-			dataSource：引用数据源
-			typeAliasesPackage：指定实体类的报名，自动将实体类的简单类名映射成为别名。相当于/day03_mybaits/src/conf.xml中实体类别名的配置
 	-->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource"/>
-		<!-- 指定MyBitas的sql语句映射文件，如果MyBitas的sql语句映射文件对应的接口不在一个包目录下，
-			就需要在这里单独指定MyBitas的sql语句映射文件，这里把他们放在一个目录下了，就只需要统一的通过MapperScannerConfigurer的
-			basePackage指定了。
-		-->
-        <!-- <property name="mapperLocations">
-            <array>
-                <value>classpath:mapper/*.xml</value>
-            </array>
-        </property> -->
-        <!-- 指定MyBitas的实体类的包名，自动将实体类的简单类名映射成为别名，
-        	这里不能使用通配符，而所有模块的实体不能放在一个包中，所有指定了也没什么意义，还不如直接在mapper文件中指定全类名
-         -->
-		<!-- <property name="typeAliasesPackage" value="com.milepost.demo.entity"/> -->
-	</bean>
-	
-	<!-- A.2. mybatis自动扫描加载Sql映射文件/接口 : MapperScannerConfigurer 
-			basePackage：指定 Sql映射文件/接口所在的包(自动扫面)，可以使用通配符
-	-->
-	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.milepost.*.mapper"/>
-	</bean> 
 	<!-- B.1 配置jdbcTemplate，只能接受占位符(?)类型的sql语句，可以通过namedParameterJdbcTemplate获取到jdbcTemplate -->
     <!-- <bean id="jdbcTemplate"
 		class="org.springframework.jdbc.core.JdbcTemplate">
@@ -120,14 +91,14 @@
 	<!-- B.3 配置两个jdbcTemplate和namedParameterJdbcTemplate的分页，暂时提供两个实现，这里都配置上，会根据当前的jdbcTemplate来判断是哪个类型的数据库  -->
 	<bean id="mysqlSQLPageHandleImpl" class="com.milepost.system.sqlparser.MysqlSQLPageHandleImpl"/>
 	<bean id="oracleSQLPageHandleImpl" class="com.milepost.system.sqlparser.OracleSQLPageHandleImpl"/>
-	
+	 
 	<!-- 3. 配置 Spring 的声明式事务 -->
 	<!-- 3.1. 配置 Spring 的事务管理器 -->
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-	<!-- 3.2. 配置事务属性，需要事务管理器 -->
+	<!-- 3.2. 启用事务注解 -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
 	
 	<!-- 4. 二级缓存相关 -->

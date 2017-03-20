@@ -47,7 +47,6 @@ public class JdbcTemplateTest {
 	/**
 	 * 只允许使用“?”占位符的sql语句
 	 */
-	//@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
 	/**

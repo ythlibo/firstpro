@@ -9,15 +9,14 @@ import com.milepost.demo.service.EmployeeService;
 import com.milepost.system.util.SpringContextUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath*:/applicationContext.xml", "classpath*:/springmvc-servlet.xml" })
+@ContextConfiguration(locations = {"classpath*:/applicationContext.xml", "classpath*:/springmvc-servlet.xml" })
 public class SpringContextUtilTest {
-
 	
 	@Test
-	public void test(){
+	public void test() throws Exception{
 		System.out.println(SpringContextUtil.getApplicationContext());
 		EmployeeService employeeService = (EmployeeService) SpringContextUtil.getBean("employeeService");
-		System.out.println(employeeService.findAll());
+		System.out.println(employeeService.queryForList(null ));
 	}
 	
 }

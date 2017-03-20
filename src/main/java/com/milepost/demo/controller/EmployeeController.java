@@ -27,7 +27,7 @@ public class EmployeeController {
 	private static Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 	
 	@ResponseBody
-	@RequestMapping("aaa")
+	@RequestMapping("aaa") 
 	public Map<String, Object> testMuiAjax(@RequestParam Map<String, String> paramsMap){
 		//测试接受参数
 		System.out.println(paramsMap);
@@ -190,6 +190,20 @@ public class EmployeeController {
 			}
 		}
 		return map;
+	}
+	
+	//http://192.168.171.44:8080/firstpro/employee/testCallback
+	@ResponseBody
+	@RequestMapping("/testCallback")
+	public Map<String,Object> testCallback(@RequestParam Map<String,Object> paramsMap){
+		try {
+			System.out.println(paramsMap);
+			long sleep = Long.parseLong(paramsMap.get("sleep").toString()); 
+			Thread.sleep(1000*sleep);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return paramsMap;
 	}
 	
 }

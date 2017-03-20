@@ -167,6 +167,11 @@ public class WebSocketServer {
 	 * @return
 	 */
 	public static int getOnLineCount(){
+		for(Map.Entry<String, WebSocketServer> entry : fromMap.entrySet()){
+			if (logger.isDebugEnabled()) {
+				logger.debug(entry.getKey() + ";" + entry.getValue());
+			}
+		}
 		return fromMap.size();
 	}
 	

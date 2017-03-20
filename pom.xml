@@ -10,12 +10,7 @@
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- <spring.version>4.0.0.RELEASE</spring.version> -->
 		<spring.version>4.3.6.RELEASE</spring.version>
-		<mybatis.version>3.3.1</mybatis.version>
-		<mapper.version>3.3.6</mapper.version>
-		<pagehelper.version>5.0.0</pagehelper.version>
-		<mybatis.spring.version>1.2.4</mybatis.spring.version>
 		<jackson.version>2.8.6</jackson.version>
 		<httpclient.version>4.3</httpclient.version>
 		<gexin.version>4.0.1.7</gexin.version>
@@ -85,7 +80,6 @@
 		</dependency>
 		
 		<!-- *************************spring -->
-		<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -165,30 +159,6 @@
 			<artifactId>spring-orm</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
-		<!--Mybatis -->
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis</artifactId>
-			<version>${mybatis.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis-spring</artifactId>
-			<version>${mybatis.spring.version}</version>
-		</dependency>
-		<!--Mybatis 分页插件 -->
-		<!-- <dependency>
-			<groupId>com.github.pagehelper</groupId>
-			<artifactId>pagehelper</artifactId>
-			<version>${pagehelper.version}</version>
-		</dependency> -->
-		<!--Mybatis 通用Mapper -->
-		<!-- <dependency>
-			<groupId>tk.mybatis</groupId>
-			<artifactId>mapper</artifactId>
-			<version>${mapper.version}</version>
-		</dependency> -->
 		
 		<!-- *************************ehcache -->
 		<dependency>

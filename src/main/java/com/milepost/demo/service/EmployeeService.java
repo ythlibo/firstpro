@@ -1,68 +1,50 @@
 package com.milepost.demo.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.milepost.demo.entity.Employee;
-import com.milepost.demo.mapper.EmployeeMapper;
+import com.milepost.demo.dao.EmployeeDao;
+import com.milepost.system.sqlparser.Page;
 
 @Service
 public class EmployeeService {
 
 	@Autowired
-	private EmployeeMapper employeeMapper;
+	private EmployeeDao employeeDao;
 
-	@Transactional
-	public void update(Employee employee) {
-		employeeMapper.update(employee);
+	public Page<Map<String, Object>> queryForListPagination(Map<String, Object> paramMap, int pageNo, int pageSize) throws Exception {
+		String sql = "SELECT * FROM EMPLOYEE WHERE 1=1 [AND LAST_NAME LIKE :lastName ][AND EMAIL LIKE :email] ORDER BY ID ASC";
+		return employeeDao.queryForListPagination(sql, paramMap, pageNo, pageSize);
 	}
 
-	@Transactional
-	public void delete(String id) {
-		employeeMapper.delete(id);
-	}
-
-	@Transactional
-	public Employee findById(String id) {
-		System.out.println("");
-		return employeeMapper.findById(id);
-	}
-
-	@Transactional
-	public List<Employee> findAll() {
-		return employeeMapper.findAll();
+	public List<Map<String, Object>> queryForList(Map<String, Object> paramMap) throws Exception {
+		String sql = "SELECT * FROM EMPLOYEE WHERE 1=1 [AND LAST_NAME LIKE :lastName ][AND EMAIL LIKE :email] ORDER BY ID ASC";
+		return employeeDao.queryForList(sql, paramMap);
 	}
 
 	/**
-	 * 测试事务，有事务注解
-	 * 
-	 * @param employee1
-	 * @param employee2
+	 * 测试事务
+	 * @param paramMap1
+	 * @param paramMap2
+	 * @throws Exception
 	 */
 	@Transactional
-	public void addWithTrans(Employee employee1, Employee employee2) {
-		employeeMapper.add(employee1);
+	public void addNoTrans(Map<String, Object> paramMap1, Map<String, Object> paramMap2) throws Exception {
+		String sql = "INSERT INTO EMPLOYEE (ID, LAST_NAME, EMAIL, BIRTH, CREATE_TIME, DEPARTMENT_ID, AGE, REMARK) " +
+				"VALUES(:id, :lastName, :email, :birth, :createTime, :departmentId[, :age][, :remark])";
+		employeeDao.updateOrInsertOrDelete(sql, paramMap1);
 		int i = 5 / 0;
-		employeeMapper.add(employee2);
-	}
-
-	/**
-	 * 测试事务，没有事务注解
-	 * 
-	 * @param employee1
-	 * @param employee2
-	 */
-	public void addNoTrans(Employee employee1, Employee employee2) {
-		employeeMapper.add(employee1);
-		int i = 5 / 0;
-		employeeMapper.add(employee2);
+		employeeDao.updateOrInsertOrDelete(sql, paramMap2);
 	}
 
 	@Transactional
-	public void add(Employee employee) {
-		employeeMapper.add(employee);
+	public int add(Map<String, Object> paramMap) throws Exception {
+		String sql = "INSERT INTO EMPLOYEE (ID, LAST_NAME, EMAIL, BIRTH, CREATE_TIME, DEPARTMENT_ID, AGE, REMARK) " +
+						"VALUES(:id, :lastName, :email, :birth, :createTime, :departmentId[, :age][, :remark])";
+		return employeeDao.updateOrInsertOrDelete(sql, paramMap);
 	}
 }
